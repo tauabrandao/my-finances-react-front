@@ -2,8 +2,9 @@ import React from 'react'
 
 import Card from '../components/card'
 import FormGroup from '../components/form-group'
+import DangerAlert from '../components/dangerAlert'
 
-import {withRouter} from 'react-router-dom'
+import { withRouter } from 'react-router-dom'
 
 import axios from 'axios'
 
@@ -11,21 +12,22 @@ class Login extends React.Component {
 
     state = {
         email: '',
-        senha: ''
+        senha: '',
+        mensagemErro: null
     }
 
     login = () => {
-        axios.post('http://localhost:8080/api/usuarios/autenticar',{
+        axios.post('http://localhost:8080/api/usuarios/autenticar', {
             email: this.state.email,
             senha: this.state.senha
         }).then(response => {
-            console.log(response)
+            this.props.history.push('/home')
         }).catch(erro => {
-            console.log(erro.response)
+            this.setState({mensagemErro: erro.response.data})
         })
     }
 
-    prepareCadastrar = () =>{
+    prepareCadastrar = () => {
         this.props.history.push('/cadastro-usuarios')
     }
 
@@ -61,6 +63,7 @@ class Login extends React.Component {
                                             <button onClick={this.login} className="btn btn-primary">Entrar</button>
                                             <button onClick={this.prepareCadastrar} className="btn btn-info">Cadastrar</button>
                                         </fieldset>
+                                        <DangerAlert>{this.state.mensagemErro}</DangerAlert>
                                     </div>
                                 </div>
                             </div>
