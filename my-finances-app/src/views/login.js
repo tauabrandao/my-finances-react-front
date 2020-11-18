@@ -4,11 +4,16 @@ import Card from '../components/card'
 import FormGroup from '../components/form-group'
 import DangerAlert from '../components/dangerAlert'
 
+import UsuarioService from '../app/service/usuarioService'
+
 import { withRouter } from 'react-router-dom'
 
-import axios from 'axios'
-
 class Login extends React.Component {
+
+    constructor(){
+        super();
+        this.service = new UsuarioService();
+    }
 
     state = {
         email: '',
@@ -17,7 +22,7 @@ class Login extends React.Component {
     }
 
     login = () => {
-        axios.post('http://localhost:8080/api/usuarios/autenticar', {
+        this.service.autenticar({
             email: this.state.email,
             senha: this.state.senha
         }).then(response => {
