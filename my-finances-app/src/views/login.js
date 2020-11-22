@@ -2,12 +2,12 @@ import React from 'react'
 
 import Card from '../components/card'
 import FormGroup from '../components/form-group'
-import DangerAlert from '../components/dangerAlert'
 import LocalStorageService from '../app/service/localStorageService'
 
 import UsuarioService from '../app/service/usuarioService'
 
 import { withRouter } from 'react-router-dom'
+import {showErrorMessage} from '../components/toastr'
 
 class Login extends React.Component {
 
@@ -18,8 +18,7 @@ class Login extends React.Component {
 
     state = {
         email: '',
-        senha: '',
-        mensagemErro: null
+        senha: ''
     }
 
     login = () => {
@@ -30,7 +29,7 @@ class Login extends React.Component {
             LocalStorageService.adicionarItem('_usuario_logado', response.data)
             this.props.history.push('/home')
         }).catch(erro => {
-            this.setState({mensagemErro: erro.response.data})
+            showErrorMessage(erro.response.data)
         })
     }
 
@@ -70,7 +69,6 @@ class Login extends React.Component {
                                             <button onClick={this.login} className="btn btn-primary">Entrar</button>
                                             <button onClick={this.prepareCadastrar} className="btn btn-info">Cadastrar</button>
                                         </fieldset>
-                                        <DangerAlert>{this.state.mensagemErro}</DangerAlert>
                                     </div>
                                 </div>
                             </div>
