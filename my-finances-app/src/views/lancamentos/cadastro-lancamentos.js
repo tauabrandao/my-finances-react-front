@@ -4,8 +4,10 @@ import Card from '../../components/card'
 import { withRouter } from 'react-router-dom'
 import FormGroup from '../../components/form-group'
 import SelectMenu from '../../components/selectMenu'
+import * as messages from '../../components/toastr'
 
 import LancamentoService from '../../app/service/lancamentoService'
+import LocalStorageService from '../../app/service/localStorageService'
 
 class CadastroLancamentos extends React.Component {
 
@@ -25,6 +27,19 @@ class CadastroLancamentos extends React.Component {
     }
 
     submit = () =>{
+
+        const usuarioLogado = LocalStorageService.obterItem('_usuario_logado');
+
+        const {descricao, valor, mes, ano, tipo} = this.state;
+        const lancamento = {descricao, valor, mes, ano, tipo, usuario: usuarioLogado.id};
+
+        this.service.salvar(lancamento)
+        .then(response => {
+            messages.showSuccessMessage('Laçamento cadastrado com sucesso')
+        }).catch(error => {
+            messages.showErrorMessage(error.response.data)
+        })
+
         console.log(this.state)
     }
 
@@ -33,6 +48,10 @@ class CadastroLancamentos extends React.Component {
         const name = event.target.name;
 
         this.setState({ [name] : value})
+    }
+
+    prepareHome = () => {
+        this.props.history.push('/home');
     }
 
     render() {
@@ -116,7 +135,7 @@ class CadastroLancamentos extends React.Component {
                 <div className="row">
                     <div className="col-md-6">
                         <button onClick={this.submit} className="btn btn-success">Salvar</button>
-                        <button className="btn btn-danger">Cancelar</button>
+                        <button onClick={this.prepareHome} className="btn btn-danger">Cancelar</button>
                     </div>
 
                 </div>
