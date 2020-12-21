@@ -18,7 +18,9 @@ class CadastroLancamentos extends React.Component {
         mes: '',
         ano: '',
         tipo: '',
-        status: ''
+        status: '',
+        usuario: null,
+        atualizando: false
     }
 
     constructor() {
@@ -26,12 +28,32 @@ class CadastroLancamentos extends React.Component {
         this.service = new LancamentoService();
     }
 
-    submit = () =>{
+    componentDidMount(){
+        const params = this.props.match.params
+        if(params.id){
+            this.service.obterPorId(params.id)
+            .then(response => {
+                this.setState({...response.data, atualizando: true})
+            }).catch(error => {
+                messages.showErrorMessage(error.response.data)
+            })
+        }
+    }
 
+    submit = () =>{
         const usuarioLogado = LocalStorageService.obterItem('_usuario_logado');
 
         const {descricao, valor, mes, ano, tipo} = this.state;
         const lancamento = {descricao, valor, mes, ano, tipo, usuario: usuarioLogado.id};
+
+        try{
+            this.service.validar(lancamento)
+        }catch(erro){
+            const mensagens = erro.mensagens;
+            mensagens.forEach(msg => messages.showErrorMessage(msg));
+            return;
+        }
+
 
         this.service.salvar(lancamento)
         .then(response => {
@@ -40,7 +62,19 @@ class CadastroLancamentos extends React.Component {
             messages.showErrorMessage(error.response.data)
         })
 
-        console.log(this.state)
+    }
+
+    atualizar = () => {
+        const {descricao, valor, mes, ano, tipo, status, usuario, id} = this.state;
+        const lancamento = {descricao, valor, mes, ano, tipo, usuario, status, id};
+
+        this.service.atualizar(lancamento)
+        .then(() => {
+            messages.showSuccessMessage('Laçamento atualizado com sucesso')
+        }).catch(error => {
+            messages.showErrorMessage(error.response.data)
+        })
+
     }
 
     handleChange = (event) => {
@@ -60,7 +94,7 @@ class CadastroLancamentos extends React.Component {
         const meses = this.service.obterListaMeses();
 
         return (
-            <Card title="Cadastro de Lançamentos">
+            <Card title={this.state.atualizando ? 'Atualização de Lançamento' : 'Cadastro de Lançamento'}>
                 <div className="row">
                     <div className="col-md-12">
                         <FormGroup id="inputDescricao" label="Descrição: *">
@@ -134,7 +168,15 @@ class CadastroLancamentos extends React.Component {
                 </div>
                 <div className="row">
                     <div className="col-md-6">
-                        <button onClick={this.submit} className="btn btn-success">Salvar</button>
+                        {
+                            this.state.atualizando ? 
+                            (
+                                <button onClick={this.atualizar} className="btn btn-info">Atualizar</button>
+                            ) :
+                            (
+                                <button onClick={this.submit} className="btn btn-success">Salvar</button>
+                            )
+                        }
                         <button onClick={this.prepareHome} className="btn btn-danger">Cancelar</button>
                     </div>
 

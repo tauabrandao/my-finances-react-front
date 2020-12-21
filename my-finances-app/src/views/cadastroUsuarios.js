@@ -1,14 +1,14 @@
 import React from 'react'
-import {withRouter} from 'react-router-dom'
+import { withRouter } from 'react-router-dom'
 import Card from '../components/card'
 import FormGroup from '../components/form-group'
 
 import UsuarioService from '../app/service/usuarioService'
-import { showErrorMessage, showSuccessMessage} from '../components/toastr'
+import { showErrorMessage, showSuccessMessage } from '../components/toastr'
 
 class CadastroUsuario extends React.Component {
 
-    constructor(){
+    constructor() {
         super();
         this.service = new UsuarioService();
     }
@@ -20,51 +20,27 @@ class CadastroUsuario extends React.Component {
         senhaRepeticao: ''
     }
 
-    validar(){
-        const msgs = []
-
-        if(!this.state.nome){
-            msgs.push('O campo Nome é obrigatório')
-        }
-
-        if(!this.state.email){
-            msgs.push('O campo Email é obrigatório')
-        }else if(!this.state.email.match(/^[a-z0-9.]+@[a-z0-9]+\.[a-z]/)){
-            msgs.push('Informe um email válido')
-        }
-
-        if(!this.state.senha || !this.state.senhaRepeticao){
-            msgs.push('Digite a senha 2x')
-        }else if(this.state.senha !== this.state.senhaRepeticao){
-            msgs.push('As senhas devem ser iguais')
-        }
-
-        return msgs;
-    }
 
     cadastrar = () => {
-        const msgs = this.validar();
 
-        if(msgs && msgs.length > 0){
-            msgs.forEach((msg, index) => {
-                showErrorMessage(msg)
-            });
-            return false;
-        }
+        const { nome, email, senha, senhaRepeticao } = this.state
+        const usuario = { nome, email, senha, senhaRepeticao }
 
-        const usuario = {
-            nome: this.state.nome,
-            email: this.state.email,
-            senha: this.state.senha
+        try{
+            this.service.validar(usuario);
+        }catch(erro){
+            const msgs = erro.mensagens;
+            msgs.forEach(msg => showErrorMessage(msg));
+            return;
         }
 
         this.service.salvar(usuario)
-        .then( response => {
-            showSuccessMessage('Usuário cadastrado com sucesso! Faça login para acessar.')
-            this.props.history.push('/login')
-        }).catch(error => {
-            showErrorMessage(error.response.data)
-        })
+            .then(response => {
+                showSuccessMessage('Usuário cadastrado com sucesso! Faça login para acessar.')
+                this.props.history.push('/login')
+            }).catch(error => {
+                showErrorMessage(error.response.data)
+            })
     }
 
     prepareLogin = () => {

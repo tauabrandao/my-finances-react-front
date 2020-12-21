@@ -17,7 +17,7 @@ class ApiService{
 
     put(url, obj){
         const requestUrl = `${this.apiUrl}${url}`;
-        return httpClient.post(requestUrl, obj);
+        return httpClient.put(requestUrl, obj);
     }
 
     delete(url){
