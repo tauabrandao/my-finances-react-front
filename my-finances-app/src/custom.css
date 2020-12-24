@@ -231,6 +231,10 @@ pre {
     margin-top: 1em;
     font-size: 12px;
 }
+
+.btn {
+    margin-right: 5px;
+}
 .sponsor .carbon-poweredby {
     float: right;
     margin-top: 1em;
